@@ -26,7 +26,5 @@ def main():
     account3.account_info()
 
 
-
-
 if __name__ == '__main__':
     main()
