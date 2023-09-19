@@ -3,14 +3,14 @@ import tkinter as tk
 from PIL import ImageTk, Image
 from tkinter import font
 
-class AFrame(tk.Toplevel):
+class WhirlPoolFrame(tk.Toplevel):
 
     def __init__(self, master):
         tk.Toplevel.__init__(self, master)  # Initialize superclass
         """Constructor"""
         self.root = master
         # Title for window and do not kill the window
-        self.title("Child A Frame")
+        self.title("Child WhirlPool Frame")
         self.protocol('WM_DELETE_WINDOW', self.OverrideWindow)
 
         # Set up the fonts you want to use
@@ -30,7 +30,7 @@ class AFrame(tk.Toplevel):
         self.resizable(False, False)
 
     def _layoutButtons(self, parent):
-        self.titleLabel = tk.Label(parent, text="Child A", font=self.ComicF1)
+        self.titleLabel = tk.Label(parent, text="Child WhirlPool", font=self.ComicF1)
         self.titleLabel.grid(row=0, column=0, sticky=N+S+E+W)
 
         self.close_Frame = tk.Button(parent, text="Close", command=self.hide, font=self.ComicF2)
@@ -38,7 +38,7 @@ class AFrame(tk.Toplevel):
 
 
     def _layoutCanvas(self, parent):
-        img_Path = 'images/grogu.png'
+        img_Path = 'images/Whirlpool.jpg'
         self.image = ImageTk.PhotoImage(file = img_Path)
         width = self.image.width()
         height = self.image.height()

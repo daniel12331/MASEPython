@@ -3,14 +3,14 @@ import tkinter as tk
 from PIL import ImageTk, Image
 from tkinter import font
 
-class BFrame(tk.Toplevel):
+class ABFrame(tk.Toplevel):
 
     def __init__(self, master):
         tk.Toplevel.__init__(self, master)  # Initialize superclass
         """Constructor"""
         self.root = master
         # Title for window and do not kill the window
-        self.title("Child A Frame")
+        self.title("Child AB Frame")
         self.protocol('WM_DELETE_WINDOW', self.OverrideWindow)
 
         # Set up the fonts you want to use
@@ -38,7 +38,7 @@ class BFrame(tk.Toplevel):
 
 
     def _layoutCanvas(self, parent):
-        img_Path = 'images/ahsoka.png'
+        img_Path = 'images/Abel.jpg'
         self.image = ImageTk.PhotoImage(file = img_Path)
         width = self.image.width()
         height = self.image.height()

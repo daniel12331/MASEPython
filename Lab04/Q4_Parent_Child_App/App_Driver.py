@@ -6,9 +6,9 @@ from SplashScreen import Splash
 def main():
     root = Tk()
     image_file = "splash.png"
-    s = Splash(root, timeout=3000, image=image_file)
+    # s = Splash(root, timeout=3000, image=image_file)
     myGUI = AppGUI(root)
-    root.title = "Karol"
+    root.title = "Daniel"
     root.resizable(False, False)
     root.mainloop()
 
