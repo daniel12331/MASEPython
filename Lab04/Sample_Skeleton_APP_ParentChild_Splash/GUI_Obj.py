@@ -6,7 +6,6 @@ from tkinter import filedialog
 import tkinter.messagebox
 import tkinter.simpledialog
 from tkinter import *
-import pylab as plt
 from ChildA_Obj import AFrame
 from ChildB_Obj import BFrame
 

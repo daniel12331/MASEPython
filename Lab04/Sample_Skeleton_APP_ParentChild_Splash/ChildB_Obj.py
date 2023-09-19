@@ -38,7 +38,7 @@ class BFrame(tk.Toplevel):
 
 
     def _layoutCanvas(self, parent):
-        img_Path = 'images\\ahsoka.png'
+        img_Path = 'images/ahsoka.png'
         self.image = ImageTk.PhotoImage(file = img_Path)
         width = self.image.width()
         height = self.image.height()
