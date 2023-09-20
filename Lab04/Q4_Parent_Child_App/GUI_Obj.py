@@ -30,7 +30,7 @@ class AppGUI(tk.Frame):
 
         # Textvariables for the values specified by the user
 
-        self.l1 = tk.Label(master, text="Q4 Parent Child", font=self.font_1).grid(row=0,column=0,columnspan=2, sticky=tk.N + tk.S + tk.E + tk.W)
+        self.l1 = tk.Label(master, text="Celestial Objects", font=self.font_1).grid(row=0,column=0,columnspan=2, sticky=tk.N + tk.S + tk.E + tk.W)
 
         self.childAB_Button = tk.Button(master, text="Abeil", command=self.showChildA, font=self.font_2)
         self.childAB_Button.grid(row=1, column=0, sticky=tk.N + tk.S + tk.E + tk.W)

@@ -2,6 +2,7 @@ from tkinter import *
 import tkinter as tk
 from PIL import ImageTk, Image
 from tkinter import font
+import webbrowser
 
 class M29Frame(tk.Toplevel):
 
@@ -29,9 +30,19 @@ class M29Frame(tk.Toplevel):
         self._layoutCanvas(canvasPanel)
         self.resizable(False, False)
 
+
+    def open_link(self,url):
+        webbrowser.open(url)
+
     def _layoutButtons(self, parent):
         self.titleLabel = tk.Label(parent, text="Child M29", font=self.ComicF1)
         self.titleLabel.grid(row=0, column=0, sticky=N+S+E+W)
+
+        self.web_link = tk.Button(parent, text="Nasa", command=lambda url="https://science.nasa.gov/m2-9-wings-butterfly-nebula": self.open_link(url), font=self.ComicF2)
+        self.web_link.grid(row=1, column=0, sticky=N+S+E+W, padx=5, pady=5)
+
+        self.video_link = tk.Button(parent, text="Play Video", command=lambda url="https://www.youtube.com/watch?v=RWJEfXQiebU": self.open_link(url), font=self.ComicF2)
+        self.video_link.grid(row=2, column=0, sticky=N+S+E+W, padx=5, pady=5)
 
         self.close_Frame = tk.Button(parent, text="Close", command=self.hide, font=self.ComicF2)
         self.close_Frame.grid(row=3, column=0, sticky=N+S+E+W, padx=5, pady=5)

@@ -2,6 +2,7 @@ from tkinter import *
 import tkinter as tk
 from PIL import ImageTk, Image
 from tkinter import font
+import webbrowser
 
 class ABFrame(tk.Toplevel):
 
@@ -33,8 +34,18 @@ class ABFrame(tk.Toplevel):
         self.titleLabel = tk.Label(parent, text="Child A", font=self.ComicF1)
         self.titleLabel.grid(row=0, column=0, sticky=N+S+E+W)
 
+        self.web_link = tk.Button(parent, text="Info", command=lambda url="https://www.astrobin.com/v0ov52/?nc=all": self.open_link(url), font=self.ComicF2)
+        self.web_link.grid(row=1, column=0, sticky=N+S+E+W, padx=5, pady=5)
+
+        self.video_link = tk.Button(parent, text="Buy Print", command=lambda url="https://cathrinmachin.myshopify.com/collections/cosmic-union-project/products/abel-85-30x40-canvas-layout": self.open_link(url), font=self.ComicF2)
+        self.video_link.grid(row=2, column=0, sticky=N+S+E+W, padx=5, pady=5)
+
         self.close_Frame = tk.Button(parent, text="Close", command=self.hide, font=self.ComicF2)
         self.close_Frame.grid(row=3, column=0, sticky=N+S+E+W, padx=5, pady=5)
+
+
+    def open_link(self,url):
+        webbrowser.open(url)
 
 
     def _layoutCanvas(self, parent):
