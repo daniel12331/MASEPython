@@ -19,6 +19,9 @@ class AppGUI(tk.Frame):
         self.master.title("Daniel Marko - Data Analytics")
         self.master.geometry("450x700")
 
+        # Variables to connect to F1 DB
+        self.connection = 'mysql+mysqlconnector://guest:relational@relational.fit.cvut.cz/ErgastF1'
+
         # This section creates the plot frame
         self.ChildA_Obj = AChild(self)
         self.ChildA_Obj.withdraw()
@@ -31,7 +34,7 @@ class AppGUI(tk.Frame):
         self.l1 = tk.Label(master, text="Daniel Marko - Data Analytics", font=self.font_1).grid(row=0,column=1,columnspan=2, sticky=tk.N + tk.S + tk.E + tk.W)
 
 
-        self.img_airbnb = ImageTk.PhotoImage(Image.open("images/anayltics.jpg").resize((400,205)))
+        self.img_airbnb = ImageTk.PhotoImage(Image.open("images/f1_team.jpg").resize((400, 205)))
         self.label = Label(master, image = self.img_airbnb)
         self.label.grid(row=1,column=1,columnspan=2, ipadx=10, ipady=10, padx=10, pady=10)
 
@@ -56,7 +59,7 @@ class AppGUI(tk.Frame):
         selected_index = self.list_box.curselection()
         if selected_index != ():
             selected_driver_name = self.list_box.get(selected_index)
-            self.ChildA_Obj.set_selected_driver(selected_driver_name)
+            self.ChildA_Obj.set_selected_driver(selected_driver_name, self.connection)
             self.ChildA_Obj.show()
             self.master.withdraw()
         else:
@@ -67,20 +70,10 @@ class AppGUI(tk.Frame):
         if self.driver_name.get() == '':
             tkinter.messagebox.showwarning("No entry entered", "No Entry Entered, please enter a name")
         else:
-            # Variables to connect to F1 DB
-            F1_server = 'relational.fit.cvut.cz'
-            F1_user = 'guest'
-            F1_password = 'relational'
-            F1_database = 'ErgastF1'
-            # Connection to DB
-            connection = mysql.connector.connect(
-                host=F1_server,
-                database=F1_database,
-                user=F1_user,
-                password=F1_password)
+
             # Query the names for analysis
             query_drivers_names = "SELECT concat(forename,' ', surname) as 'Drivers Names' FROM drivers where forename like '%{0}%'".format(self.driver_name.get())
-            df_mysql = pd.read_sql(query_drivers_names, con=connection)
+            df_mysql = pd.read_sql(query_drivers_names, con=self.connection)
 
             # clear the names in the list box prior to displaying the selection
             self.list_box.delete(0, tk.END)

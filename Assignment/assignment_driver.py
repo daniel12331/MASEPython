@@ -16,7 +16,7 @@ def main():
 
     myGUI = AppGUI(root)
     root.title = "Daniel Marko"
-    p1 = PhotoImage(file='images/airbnb.png')
+    p1 = PhotoImage(file='images/f1_logo.png')
     root.iconphoto(False, p1)
     root.resizable(False, False)
     root.mainloop()
