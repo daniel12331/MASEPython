@@ -1,0 +1,55 @@
+
+
+Print DataFrame Info for table atom
+<class 'pandas.core.frame.DataFrame'>
+RangeIndex: 9064 entries, 0 to 9063
+Data columns (total 5 columns):
+ #   Column    Non-Null Count  Dtype 
+---  ------    --------------  ----- 
+ 0   atomid    9064 non-null   object
+ 1   drug      9064 non-null   object
+ 2   atomtype  9064 non-null   object
+ 3   charge    9064 non-null   object
+ 4   name      9064 non-null   object
+dtypes: object(5)
+memory usage: 354.2+ KB
+None
+
+
+Print Number of Unique Items in atom
+atomid      9064
+drug         340
+atomtype      66
+charge         5
+name          24
+dtype: int64
+
+
+Print Number of Unique Items in Each Column for table atom
+atomid      [d100_1, d100_10, d100_11, d100_12, d100_13, d...
+drug        [d100, d101, d102, d103, d104, d105, d106, d10...
+atomtype    [22, 3, 16, 93, 10, 45, 8, 21, 14, 77, 36, 51,...
+charge      [a0=-0_1355<x<=-0_0175, a0=0_1375<x<=+inf, a0=...
+name        [c, h, cl, o, s, n, sn, br, p, na, f, ti, k, s...
+dtype: object
+
+
+Table: atom
++---+---------+------+----------+-----------------------+------+
+|   | atomid  | drug | atomtype |        charge         | name |
++---+---------+------+----------+-----------------------+------+
+| 0 | d100_1  | d100 |    22    | a0=-0_1355<x<=-0_0175 |  c   |
+| 1 | d100_10 | d100 |    3     |   a0=0_1375<x<=+inf   |  h   |
+| 2 | d100_11 | d100 |    22    | a0=-0_1355<x<=-0_0175 |  c   |
+| 3 | d100_12 | d100 |    22    | a0=-0_1355<x<=-0_0175 |  c   |
+| 4 | d100_13 | d100 |    22    | a0=-0_1355<x<=-0_0175 |  c   |
++---+---------+------+----------+-----------------------+------+
++------+--------+------+----------+---------------------+------+
+|      | atomid | drug | atomtype |       charge        | name |
++------+--------+------+----------+---------------------+------+
+| 9059 |  d9_5  |  d9  |    22    |  a0=0_1375<x<=+inf  |  c   |
+| 9060 |  d9_6  |  d9  |    22    | a0=-inf<x<=-0_1355  |  c   |
+| 9061 |  d9_7  |  d9  |    3     | a0=0_0615<x<=0_1375 |  h   |
+| 9062 |  d9_8  |  d9  |    3     | a0=0_0615<x<=0_1375 |  h   |
+| 9063 |  d9_9  |  d9  |    3     | a0=0_0615<x<=0_1375 |  h   |
++------+--------+------+----------+---------------------+------+

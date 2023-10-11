@@ -20,7 +20,15 @@ class AppGUI(tk.Frame):
         self.master.geometry("450x700")
 
         # Variables to connect to F1 DB
-        self.connection = 'mysql+mysqlconnector://guest:relational@relational.fit.cvut.cz/ErgastF1'
+        # self.connection = 'mysql+mysqlconnector://guest:relational@relational.fit.cvut.cz/ErgastF1'
+
+        self.connection = mysql.connector.connect(
+            host="relational.fit.cvut.cz",
+            database="ErgastF1",
+            user="guest",
+            password="relational",
+            port="3306"
+        )
 
         # This section creates the plot frame
         self.ChildA_Obj = AChild(self)
@@ -88,7 +96,6 @@ class AppGUI(tk.Frame):
 
 
     def CloseApplication(self):
-        print('closing')
         self.master.destroy()
 
     def show(self):
