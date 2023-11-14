@@ -21,12 +21,11 @@ class AppGUI(tk.Frame):
 
         # Variables to connect to F1 DB
         # self.connection = 'mysql+mysqlconnector://guest:relational@relational.fit.cvut.cz/ErgastF1'
-
         self.connection = mysql.connector.connect(
-            host="relational.fit.cvut.cz",
-            database="ErgastF1",
-            user="guest",
-            password="relational",
+            host="localhost",
+            database="f1",
+            user="root",
+            password="root",
             port="3306"
         )
 

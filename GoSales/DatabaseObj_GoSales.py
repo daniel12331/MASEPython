@@ -4,9 +4,8 @@ from sqlalchemy import create_engine, inspect
 import matplotlib.pyplot as plt
 import tkinter as tk
 from tkinter import ttk
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import textwrap
+
 
 class DBConnection:
     def __init__(self, connectInfo):
@@ -123,11 +122,6 @@ class DBConnection:
 
         wrapped_labels = [textwrap.fill(label, 10) for label in resultset['Product']]
 
-        root = tk.Tk()
-        root.title("GoSales")
-
-        frame = ttk.Frame(root)
-        frame.pack(expand=True, fill=tk.BOTH)
 
         fig,ax = plt.subplots(figsize=(5,4), dpi=100)
         ax.ticklabel_format(axis='y',style='plain')
@@ -140,43 +134,30 @@ class DBConnection:
         ax.set_ylabel('Amount in $')
         ax.set_title('Top 10 Products based on Sales and Profit')
         ax.legend()
+        plt.show()
 
-        canvas = FigureCanvasTkAgg(fig, master=frame)
-        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
-
-
-        from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
-        toolbar = NavigationToolbar2Tk(canvas,frame)
-        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
-        toolbar.update()
-
-        root.mainloop()
 
     def analyseProductByID(self, prod_ID):
         print("The analyseProductByID function")
         resultset = self.merged_df[self.merged_df['Product number']==prod_ID]
         #Create a resultset form the merged_df based on the prodID
-        print(tabulate(resultset,headers='keys' ,showindex=True))
         orders = resultset[['Date','Quantity','Unit sale price', 'Total Sales', 'Total Profit']]
         filtered = orders[orders['Unit sale price'] != 0]
-        unitPrice = resultset['Unit Price'][0]
-        unitCost = resultset['Unit cost'][0]
+        unitPrice = resultset['Unit price'].iat[0]
+        unitCost = resultset['Unit cost'].iat[0]
         total_sold = filtered['Quantity'].sum()
-        total_sales = filtered['Total Sales'][0]
-        total_profit = filtered['Total Profit'][0]
+        total_sales = filtered['Total Sales'].sum()
+        total_profit = filtered['Total Profit'].sum()
         total_orders = len(filtered)
         print('Unit Price: {0}'.format(unitPrice))
         print('Unit Cost: {0}'.format(unitCost))
         print('Orders: {0}'.format(total_orders))
         print('Sold: {0}'.format(total_sold))
         print('Sales : {0}'.format(round(total_sales,2)))
-        print('Profit: {0}'.format(round(total_profit)),2)
+        print('Profit: {0}'.format(round(total_profit,2)))
+        print(tabulate(resultset.head(15),headers='keys' ,showindex=True))
 
-        root = tk.Tk()
-        root.title("Go Sales")
 
-        frame = ttk.Frame(root)
-        frame.pack(expand=True, fill=tk.BOTH)
 
         fig, ax = plt.subplots(figsize=(5, 4), dpi=100)
         ax.ticklabel_format(axis='y', style='plain')
@@ -189,16 +170,9 @@ class DBConnection:
         ax.set_ylabel('Amount in $')
         ax.set_title('Product by ID: {0}'.format(prod_ID))
         ax.legend()
+        plt.show()
 
-        canvas = FigureCanvasTkAgg(fig, master=frame)
-        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
 
-        from matplotlib.backends.backend_tkagg import NavigationToolbar2Tk
-        toolbar = NavigationToolbar2Tk(canvas, frame)
-        canvas.get_tk_widget().pack(fill=tk.BOTH, expand=True)
-        toolbar.update()
-
-        root.mainloop()
     def printDF(self, dataF):
         print('Print the dataF using tabulate')
         #Using tabulate print the head and tail of the dataF
@@ -206,5 +180,5 @@ class DBConnection:
     def disposeConnection(self):
         print("Close the connection")
         # Close the database connection
-        self.mydb.dispose()
+        # self.mydb.dispose()
 

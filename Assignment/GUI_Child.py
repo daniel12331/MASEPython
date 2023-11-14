@@ -8,6 +8,11 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 import Driver_Profile
+import Driver_Races
+import matplotlib.pyplot as plt
+from tkinter import ttk
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
 
 class AChild(tk.Toplevel):
     def __init__(self, master):
@@ -25,7 +30,11 @@ class AChild(tk.Toplevel):
         self.resizable(False, False)
         self.geometry('1920x1080')
 
+        self.connections=None
+        self.driver_name=None
     def set_selected_driver(self, driver_name, connection):
+        self.connections = connection
+        self.driver_name = driver_name
         self.title(driver_name)
         driver_info = Driver_Profile.get_driver_url(driver_name, connection)
 
@@ -47,9 +56,11 @@ class AChild(tk.Toplevel):
         self.web_link = tk.Button(parent, text="Info", command=lambda url=driver_info: self.open_link(url), font=self.ComicF2)
         self.web_link.grid(row=1, column=0, sticky=N+S+E+W, padx=5, pady=5)
 
+        self.races_btn = tk.Button(parent, text="Races", command=self.loadRaces,font=self.ComicF2)
+        self.races_btn.grid(row=1, column=0, sticky=N + S + E + W, padx=5, pady=5)
+
         self.close_Frame = tk.Button(parent, text="Go Back", command=self.hide, font=self.ComicF2)
         self.close_Frame.grid(row=3, column=0, sticky=N + S + E + W, padx=5, pady=5)
-
     def open_link(self,url):
         webbrowser.open(url)
 
@@ -73,6 +84,22 @@ class AChild(tk.Toplevel):
         self.canvas = tk.Canvas(parent, height=1080, width=1920)
         self.canvas.grid(row=3, column=0, sticky=N + S + E + W)
         self.canvas.create_image(0, 1, anchor='nw', image=self.image)
+
+    def loadRaces(self):
+        circuits, fastestsTimes =Driver_Races.get_driver_fastests_laps(self.connections, self.driver_name)
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 6), dpi=100)
+
+        ax2.bar(circuits, fastestsTimes)
+        ax2.set_xlabel('Category')
+        ax2.set_ylabel('Value')
+        ax2.set_title('Bar Chart')
+
+        # plt.bar(circuits, fastestsTimes, color = 'blue', width = 0.5)
+        #
+        # plt.xlabel("Fastest Lap Time")
+        # plt.ylabel("Circuit names and countries")
+        # plt.title("Top 5 Circuits with the fastest lap times")
+        # plt.show()
 
     def show(self):
         self.update()       # Update the window

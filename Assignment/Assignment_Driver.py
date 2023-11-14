@@ -4,13 +4,13 @@ from GUI_main import AppGUI
 
 
 
-F1_server = 'relational.fit.cvut.cz'
+F1_server = 'localhost'
 F1_port = '3306'
-F1_user = 'guest'
-F1_password = 'relational'
-F1_database = 'ErgastF1'
+F1_user = 'root'
+F1_password = 'root'
+F1_database = 'f1'
 
-
+db_info=(F1_server, F1_port, F1_user,F1_password,F1_database)
 def main():
     root = Tk()
 
