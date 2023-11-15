@@ -86,13 +86,53 @@ class AChild(tk.Toplevel):
         self.canvas.create_image(0, 1, anchor='nw', image=self.image)
 
     def loadRaces(self):
-        circuits, fastestsTimes =Driver_Races.get_driver_fastests_laps(self.connections, self.driver_name)
-        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 6), dpi=100)
+        # Get the drivers five fastest laps
+        fastestsTimes =Driver_Races.get_driver_fastests_laps(self.connections, self.driver_name)
 
-        ax2.bar(circuits, fastestsTimes)
-        ax2.set_xlabel('Category')
-        ax2.set_ylabel('Value')
-        ax2.set_title('Bar Chart')
+        fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(2, 2, figsize=(8, 4), dpi=70)
+
+
+        ax1.bar(fastestsTimes['racetracks'], fastestsTimes['fastestLapTime'])
+        ax1.set_ylabel('Fastests Lap times')
+        ax1.set_title('Top Five Fastest Lap Times')
+        ax1.set_ylim(min(fastestsTimes['fastestLapTime']) - 0.5, max(fastestsTimes['fastestLapTime'] + 0.5 ))
+        ax1.tick_params(axis='x', labelrotation=15)
+
+        for patch in ax1.patches:
+            x0, y0 = patch.get_xy()
+            x0 += patch.get_width() / 2
+            y0 += patch.get_height()
+            color = patch.get_facecolor()
+            ax1.text(x0, y0, str(y0), ha="center", va="bottom", color="white", clip_on=True, bbox=dict(ec="black",fc=color))
+
+        # Get the drivers total wins and loses
+        driver_wins,driver_loses = Driver_Races.get_driver_wins_losses(self.connections, self.driver_name)
+        labels = 'Wins', 'Loses'
+
+        ax2.pie((driver_wins,driver_loses), labels=labels, autopct='% 1.1f %%'
+                ,shadow=True, startangle=90)
+        ax2.axis('equal')
+        ax2.set_title('Total Wins and Loses')
+
+
+        # Get the drivers average pitstop time
+        Driver_Races.get_driver_average_pitstop_lap(self.connections, self.driver_name)
+        ax3.bar(fastestsTimes['racetracks'], fastestsTimes['fastestLapTime'])
+        ax3.set_xlabel('Circuits')
+        ax3.set_ylabel('Fastests Lap times')
+        ax3.set_title('Top Five Fastest Lap Times')
+
+        ax4.bar(fastestsTimes['racetracks'], fastestsTimes['fastestLapTime'])
+        ax4.set_xlabel('Circuits')
+        ax4.set_ylabel('Fastests Lap times')
+        ax4.set_title('Top Five Fastest Lap Times')
+
+        canvas = FigureCanvasTkAgg(fig, master=self.canvasPanel)
+        canvas_widget = canvas.get_tk_widget()
+
+        canvas_widget.grid(row=3,column=0,sticky=N+S+E+W)
+
+        canvas.draw()
 
         # plt.bar(circuits, fastestsTimes, color = 'blue', width = 0.5)
         #
