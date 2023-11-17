@@ -57,7 +57,7 @@ class AChild(tk.Toplevel):
         self.web_link.grid(row=1, column=0, sticky=N+S+E+W, padx=5, pady=5)
 
         self.races_btn = tk.Button(parent, text="Races", command=self.loadRaces,font=self.ComicF2)
-        self.races_btn.grid(row=1, column=0, sticky=N + S + E + W, padx=5, pady=5)
+        self.races_btn.grid(row=2, column=0, sticky=N + S + E + W, padx=5, pady=5)
 
         self.close_Frame = tk.Button(parent, text="Go Back", command=self.hide, font=self.ComicF2)
         self.close_Frame.grid(row=3, column=0, sticky=N + S + E + W, padx=5, pady=5)
@@ -89,11 +89,11 @@ class AChild(tk.Toplevel):
         # Get the drivers five fastest laps
         fastestsTimes =Driver_Races.get_driver_fastests_laps(self.connections, self.driver_name)
 
-        fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(2, 2, figsize=(8, 4), dpi=70)
+        fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(2, 2, dpi=70)
 
 
         ax1.bar(fastestsTimes['racetracks'], fastestsTimes['fastestLapTime'])
-        ax1.set_ylabel('Fastests Lap times')
+        ax1.set_ylabel('Fastests Lap times (seconds)')
         ax1.set_title('Top Five Fastest Lap Times')
         ax1.set_ylim(min(fastestsTimes['fastestLapTime']) - 0.5, max(fastestsTimes['fastestLapTime'] + 0.5 ))
         ax1.tick_params(axis='x', labelrotation=15)
@@ -110,22 +110,31 @@ class AChild(tk.Toplevel):
         labels = 'Wins', 'Loses'
 
         ax2.pie((driver_wins,driver_loses), labels=labels, autopct='% 1.1f %%'
-                ,shadow=True, startangle=90)
+                ,shadow=True, startangle=90, explode=(0.05,0.05), colors=['#5AF04B', '#DF3939'])
         ax2.axis('equal')
         ax2.set_title('Total Wins and Loses')
 
 
         # Get the drivers average pitstop time
-        Driver_Races.get_driver_average_pitstop_lap(self.connections, self.driver_name)
-        ax3.bar(fastestsTimes['racetracks'], fastestsTimes['fastestLapTime'])
-        ax3.set_xlabel('Circuits')
-        ax3.set_ylabel('Fastests Lap times')
-        ax3.set_title('Top Five Fastest Lap Times')
+        average_pitstop_duration = Driver_Races.get_driver_average_pitstop_lap(self.connections, self.driver_name)
+        ax3.plot(average_pitstop_duration['raceId'],average_pitstop_duration['duration'], color='orange', linewidth= '2')
+        ax3.set_xlabel('Total Races')
+        ax3.set_ylabel('Average Pit stop duration (seconds)')
+        ax3.set_title('Average Pit Stop Time For Each Race')
 
-        ax4.bar(fastestsTimes['racetracks'], fastestsTimes['fastestLapTime'])
-        ax4.set_xlabel('Circuits')
-        ax4.set_ylabel('Fastests Lap times')
-        ax4.set_title('Top Five Fastest Lap Times')
+
+        fastestSpeeds = Driver_Races.get_driver_top_speed(self.connections, self.driver_name)
+
+        s = ax4.barh(fastestSpeeds['name'], fastestSpeeds['fastestLapSpeed'], color='darkorchid')
+        ax4.set_xlabel('Highest Speeds (km/h)')
+
+        ax4.set_title('Top Five Fastest Speeds')
+        high_limit = max(fastestSpeeds['fastestLapSpeed']) + 5
+        low_limit = min(fastestSpeeds['fastestLapSpeed']) - 5
+        ax4.set_xlim(low_limit, high_limit)
+
+        ax4.tick_params(axis='y', labelrotation=50)
+        ax4.bar_label(s, label_type="center", color='white')
 
         canvas = FigureCanvasTkAgg(fig, master=self.canvasPanel)
         canvas_widget = canvas.get_tk_widget()
@@ -133,13 +142,6 @@ class AChild(tk.Toplevel):
         canvas_widget.grid(row=3,column=0,sticky=N+S+E+W)
 
         canvas.draw()
-
-        # plt.bar(circuits, fastestsTimes, color = 'blue', width = 0.5)
-        #
-        # plt.xlabel("Fastest Lap Time")
-        # plt.ylabel("Circuit names and countries")
-        # plt.title("Top 5 Circuits with the fastest lap times")
-        # plt.show()
 
     def show(self):
         self.update()       # Update the window

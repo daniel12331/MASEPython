@@ -49,13 +49,32 @@ def get_driver_wins_losses(connection,driver_name):
     return total_wins,total_loses
 
 def get_driver_average_pitstop_lap(connection,driver_name):
-    pd.set_option('display.max_rows', None)
+    pd.set_option('display.max_columns', None)
     driver_id = get_driver_id(driver_name, connection)
     #
     query_driver_average_pitstop = "SELECT results.raceId, duration FROM results INNER JOIN pit_stops on results.raceId = pit_stops.raceId WHERE results.driverId = {0}".format(driver_id)
     df_mysql = pd.read_sql(query_driver_average_pitstop, con=connection)
-    # df_mysql = pd.to_numeric(df_mysql['duration'])
-    # df_mysql.groupby(['raceId'])
+    # Changing the duration column to numeric and changing unfitting values to Nan
+    df_mysql['duration'] = pd.to_numeric(df_mysql['duration'], errors='coerce')
+    # Drop NaN values
+    cleaned_df_average_pit_stop = df_mysql.dropna()
+    # Group by raceid and get average pit stop duration per race
+    cleaned_df_average_pit_stop = cleaned_df_average_pit_stop.groupby(['raceId']).mean().reset_index()
+    return cleaned_df_average_pit_stop
 
-    print(df_mysql)
-    # return total_wins,total_loses
+def get_driver_top_speed(connection,driver_name):
+    pd.set_option('display.max_rows', None)
+    driver_id = get_driver_id(driver_name, connection)
+    #
+    query_driver_average_pitstop = "SELECT circuits.name, fastestLapSpeed FROM results INNER JOIN races on results.raceId = races.raceId JOIN circuits on races.circuitId = circuits.circuitId WHERE results.driverId = {0}".format(driver_id)
+    df_mysql = pd.read_sql(query_driver_average_pitstop, con=connection)
+    # format and turn \N values into NaN
+    df_mysql['fastestLapSpeed'] = pd.to_numeric(df_mysql['fastestLapSpeed'], errors='coerce')
+    # drop the NA values
+    df_mysql.dropna(inplace=True)
+    # group by name and get the highest fastestLapTime for each circuit(name)
+    cleaned_top_speed = df_mysql.loc[df_mysql.groupby(['name'])['fastestLapSpeed'].idxmax()]
+    # get top 5 fastests speeds
+    top_per_circuit = cleaned_top_speed.sort_values(by=['fastestLapSpeed'], ascending=False).head(5)
+
+    return top_per_circuit
