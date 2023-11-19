@@ -1,8 +1,11 @@
+import mysql.connector
 import pandas as pd
 from sqlalchemy import create_engine
 
 import tkinter
 from tkinter import messagebox
+
+from sqlalchemy.exc import SQLAlchemyError
 
 root = tkinter.Tk()
 root.withdraw()
@@ -25,7 +28,14 @@ df_status = pd.read_csv('archive/status.csv')
 
 
 try:
-    engine = create_engine('mysql://root:root@localhost/f1')
+    # engine = mysql.connector.connect(
+    #     host="localhost",
+    #     database="f1",
+    #     user="root",
+    #     password="root",
+    #     port="3306"
+    # )
+    engine = create_engine("mysql+mysqlconnector://root:root@localhost/f1")
     df_circuits.to_sql(name='circuits', con=engine, if_exists='append', index=False)
     df_constructor_results.to_sql(name='constructor_results', con=engine, if_exists='append', index=False)
     df_constructor_standings.to_sql(name='constructor_standings', con=engine, if_exists='append', index=False)
@@ -42,7 +52,8 @@ try:
     df_status.to_sql(name='status', con=engine, if_exists='append', index=False)
     messagebox.showinfo("Successful", "The database has been loaded and created successfully!")
 
-except:
+except SQLAlchemyError:
     messagebox.showerror("ERROR", "The database hasnt been created properly")
+
 
 

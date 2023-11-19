@@ -28,7 +28,16 @@ class AChild(tk.Toplevel):
         self.ComicF2 = font.Font(family="Calibri", size=12, weight="normal")
 
         self.resizable(False, False)
+
+        # Windows 1920x1080
+        self.width = 1900
+        self.height = 1080
         self.geometry('1920x1080')
+
+        # MAC 13.3 RES
+        # self.width = 1400
+        # self.height = 800
+        # self.geometry('1440x800')
 
         self.connections=None
         self.driver_name=None
@@ -70,7 +79,7 @@ class AChild(tk.Toplevel):
             pil_image = Driver_Profile.get_driver_image(driver_info)
             self.image = ImageTk.PhotoImage(pil_image)
 
-            self.canvas = tk.Canvas(parent, height=1080, width=1920)
+            self.canvas = tk.Canvas(parent, height=self.height, width=self.width)
             self.canvas.grid(row=3, column=0, sticky=N + S + E + W)
             self.canvas.create_image(0, 1, anchor='nw', image=self.image)
 
