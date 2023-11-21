@@ -1,16 +1,14 @@
-import io
 from tkinter import *
 import tkinter as tk
-from PIL import ImageTk, Image
+
+import numpy as np
+from PIL import ImageTk
 from tkinter import font
 import webbrowser
-import pandas as pd
-import requests
-from bs4 import BeautifulSoup
 import Driver_Profile
 import Driver_Races
 import matplotlib.pyplot as plt
-from tkinter import ttk
+import matplotlib.pyplot as mlines
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
@@ -32,7 +30,7 @@ class AChild(tk.Toplevel):
         # Windows 1920x1080
         self.width = 1900
         self.height = 1080
-        self.geometry('1920x1080')
+        self.geometry('1915x1080')
 
         # MAC 13.3 RES
         # self.width = 1400
@@ -68,8 +66,11 @@ class AChild(tk.Toplevel):
         self.races_btn = tk.Button(parent, text="Races", command=self.loadRaces,font=self.ComicF2)
         self.races_btn.grid(row=2, column=0, sticky=N + S + E + W, padx=5, pady=5)
 
+        self.races_btn = tk.Button(parent, text="RacesV2", command=self.loadRacesV2,font=self.ComicF2)
+        self.races_btn.grid(row=3, column=0, sticky=N + S + E + W, padx=5, pady=5)
+
         self.close_Frame = tk.Button(parent, text="Go Back", command=self.hide, font=self.ComicF2)
-        self.close_Frame.grid(row=3, column=0, sticky=N + S + E + W, padx=5, pady=5)
+        self.close_Frame.grid(row=4, column=0, sticky=N + S + E + W, padx=5, pady=5)
     def open_link(self,url):
         webbrowser.open(url)
 
@@ -149,6 +150,68 @@ class AChild(tk.Toplevel):
         canvas_widget = canvas.get_tk_widget()
 
         canvas_widget.grid(row=3,column=0,sticky=N+S+E+W)
+
+        canvas.draw()
+
+    def loadRacesV2(self):
+        fig, ((ax1,ax2),(ax3,ax4)) = plt.subplots(2, 2, dpi=70)
+
+        # Get the driver and constructors total points
+        consPoints_driverPoints_relationship = Driver_Races.get_driver_constructor_points(self.connections, self.driver_name)
+
+        ax1.scatter(consPoints_driverPoints_relationship['constructor_points'], consPoints_driverPoints_relationship['driver_points'], color='deepskyblue',marker='o')
+        line = mlines.Line2D([0, 1], [0, 1], color='red')
+        transform = ax1.transAxes
+        line.set_transform(transform)
+        ax1.add_line(line)
+
+        ax1.set_xlabel('Constructor Points')
+        ax1.set_ylabel('Driver Points')
+        ax1.set_title('Relationship Constructor & Driver points (Top 15 wins)')
+        ax1.grid(True, linestyle='--', alpha=0.7)
+
+        # Get the drivers & constructor total wins and loses
+        df_top_fifteen_wins_constructor = Driver_Races.get_driver_constructor_wins(self.connections, self.driver_name)
+
+        bar_width = 0.4
+        bar_positions = range(len(df_top_fifteen_wins_constructor))
+        print(bar_positions)
+        ax2.bar(bar_positions, df_top_fifteen_wins_constructor['constructor_wins'], color='yellowgreen', label='Constructor Wins', width=bar_width)
+        ax2.bar([pos + bar_width for pos in bar_positions], df_top_fifteen_wins_constructor['driver_wins'], color='lightcoral', width=bar_width, label='Driver Wins')
+
+        ax2.set_xticks([pos + bar_width/2 for pos in bar_positions])
+        ax2.set_xticklabels(f'Race {i+1}' for i in bar_positions)
+        ax2.set_xlabel('Races')
+        ax2.set_ylabel('Number of wins')
+        ax2.set_title('Constructor Wins and driver win contribution')
+        ax2.grid(True, linestyle='--', alpha=0.7)
+        ax2.legend()
+
+        # # Get the drivers average pitstop time
+        # average_pitstop_duration = Driver_Races.get_driver_average_pitstop_lap(self.connections, self.driver_name)
+        # ax3.plot(average_pitstop_duration['raceId'], average_pitstop_duration['duration'], color='orange',
+        #          linewidth='2')
+        # ax3.set_xlabel('Total Races')
+        # ax3.set_ylabel('Average Pit stop duration (seconds)')
+        # ax3.set_title('Average Pit Stop Time For Each Race')
+        #
+        # fastestSpeeds = Driver_Races.get_driver_top_speed(self.connections, self.driver_name)
+        #
+        # s = ax4.barh(fastestSpeeds['name'], fastestSpeeds['fastestLapSpeed'], color='darkorchid')
+        # ax4.set_xlabel('Highest Speeds (km/h)')
+        #
+        # ax4.set_title('Top Five Fastest Speeds')
+        # high_limit = max(fastestSpeeds['fastestLapSpeed']) + 5
+        # low_limit = min(fastestSpeeds['fastestLapSpeed']) - 5
+        # ax4.set_xlim(low_limit, high_limit)
+        #
+        # ax4.tick_params(axis='y', labelrotation=50)
+        # ax4.bar_label(s, label_type="center", color='white')
+
+        canvas = FigureCanvasTkAgg(fig, master=self.canvasPanel)
+        canvas_widget = canvas.get_tk_widget()
+
+        canvas_widget.grid(row=3, column=0, sticky=N + S + E + W)
 
         canvas.draw()
 
