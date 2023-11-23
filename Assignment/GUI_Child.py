@@ -175,7 +175,7 @@ class AChild(tk.Toplevel):
 
         bar_width = 0.4
         bar_positions = range(len(df_top_fifteen_wins_constructor))
-        print(bar_positions)
+
         ax2.bar(bar_positions, df_top_fifteen_wins_constructor['constructor_wins'], color='yellowgreen', label='Constructor Wins', width=bar_width)
         ax2.bar([pos + bar_width for pos in bar_positions], df_top_fifteen_wins_constructor['driver_wins'], color='lightcoral', width=bar_width, label='Driver Wins')
 
@@ -187,24 +187,24 @@ class AChild(tk.Toplevel):
         ax2.grid(True, linestyle='--', alpha=0.7)
         ax2.legend()
 
-        # # Get the drivers average pitstop time
-        # average_pitstop_duration = Driver_Races.get_driver_average_pitstop_lap(self.connections, self.driver_name)
-        # ax3.plot(average_pitstop_duration['raceId'], average_pitstop_duration['duration'], color='orange',
-        #          linewidth='2')
-        # ax3.set_xlabel('Total Races')
-        # ax3.set_ylabel('Average Pit stop duration (seconds)')
-        # ax3.set_title('Average Pit Stop Time For Each Race')
-        #
-        # fastestSpeeds = Driver_Races.get_driver_top_speed(self.connections, self.driver_name)
-        #
-        # s = ax4.barh(fastestSpeeds['name'], fastestSpeeds['fastestLapSpeed'], color='darkorchid')
-        # ax4.set_xlabel('Highest Speeds (km/h)')
-        #
-        # ax4.set_title('Top Five Fastest Speeds')
-        # high_limit = max(fastestSpeeds['fastestLapSpeed']) + 5
-        # low_limit = min(fastestSpeeds['fastestLapSpeed']) - 5
-        # ax4.set_xlim(low_limit, high_limit)
-        #
+        # Get drivers status
+        df_driver_status = Driver_Races.get_driver_status_races(self.connections, self.driver_name)
+
+        ax3.barh(df_driver_status['status'], df_driver_status['count'], color='salmon')
+        ax3.set_xlabel('Count of statuses')
+        ax3.set_ylabel('Status Type')
+        ax3.set_title('Different Statuses for races')
+
+
+        fastestSpeeds = Driver_Races.get_driver_fastestlap_count(self.connections, self.driver_name)
+        theBins = [0, 10, 20, 30, 40, 50, 60, 70, 80]
+        counts, bins, bars = ax4.hist(fastestSpeeds['fastestLap'], bins=theBins, edgecolor='yellow', color='green')
+        ax4.plot(bins[:-1] + 1.5/2, counts, color='red')
+
+        ax4.set_xlabel('0 - 80 Lap (bins)')
+        ax4.set_ylabel('Count of Fastest Lap')
+        ax4.set_title('Frequency Distribution for Lap No.')
+
         # ax4.tick_params(axis='y', labelrotation=50)
         # ax4.bar_label(s, label_type="center", color='white')
 

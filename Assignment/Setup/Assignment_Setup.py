@@ -1,11 +1,9 @@
-import mysql.connector
 import pandas as pd
 from sqlalchemy import create_engine
-
 import tkinter
 from tkinter import messagebox
-
 from sqlalchemy.exc import SQLAlchemyError
+
 
 root = tkinter.Tk()
 root.withdraw()
