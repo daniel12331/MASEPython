@@ -13,7 +13,7 @@ from GUI_Child import AChild
 
 class AppGUI(tk.Frame):
 
-    def __init__(self, master=None):
+    def __init__(self, master):
         tk.Frame.__init__(self, master)
         self.master = master
         self.master.title("Daniel Marko - Data Analytics")
@@ -42,8 +42,8 @@ class AppGUI(tk.Frame):
         self.l1 = tk.Label(master, text="Daniel Marko - Data Analytics", font=self.font_1).grid(row=0,column=1,columnspan=2, sticky=tk.N + tk.S + tk.E + tk.W)
 
 
-        self.img_airbnb = ImageTk.PhotoImage(Image.open("images/f1_team.jpg").resize((400, 205)))
-        self.label = Label(master, image = self.img_airbnb)
+        self.img_f1_team = ImageTk.PhotoImage(Image.open("images/f1_team.jpg").resize((400, 205)))
+        self.label = Label(master, image=self.img_f1_team)
         self.label.grid(row=1,column=1,columnspan=2, ipadx=10, ipady=10, padx=10, pady=10)
 
         self.label_search = tk.Label(master, text="Search for F1 driver name : ").grid(row=2, column=1, columnspan=2,ipadx=10, ipady=0, padx=100, pady=0,sticky=tk.N + tk.S + tk.E + tk.W)
