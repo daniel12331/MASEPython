@@ -1,15 +1,20 @@
 from tkinter import *
 import tkinter as tk
 
+import numpy as np
 import pandas as pd
 import self
 from PIL import ImageTk
 from tkinter import font, ttk
 import webbrowser
+
+from matplotlib import image as mpimg
+
 import Driver_Profile
 import Driver_Data_1
 import Driver_Data_2
 from Driver_Regression import Driver_Regression
+from Driver_Comparison import Driver_Comparison
 
 import matplotlib.pyplot as plt
 import matplotlib.pyplot as mlines
@@ -47,6 +52,9 @@ class AChild(tk.Toplevel):
         self.Regression_ChildObj = Driver_Regression(self)
         self.Regression_ChildObj.withdraw()
 
+        self.Comparison_ChildObj = Driver_Comparison(self)
+        self.Comparison_ChildObj.withdraw()
+
     def set_selected_driver(self, driver_name, connection):
         self.connections = connection
         self.driver_name = driver_name
@@ -77,7 +85,7 @@ class AChild(tk.Toplevel):
         self.racesv2_btn = tk.Button(parent, text="RacesV2", command=self.loadRacesData2, font=self.ComicF2)
         self.racesv2_btn.grid(row=3, column=0, sticky=N + S + E + W, padx=5, pady=5)
 
-        self.compare_driver = tk.Button(parent, text="Compare", command=self.loadRacesData2, font=self.ComicF2)
+        self.compare_driver = tk.Button(parent, text="Compare", command=self.loadComparison, font=self.ComicF2)
         self.compare_driver.grid(row=4, column=0, sticky=N + S + E + W, padx=5, pady=5)
 
         self.regression_btn = tk.Button(parent, text="Regression", command=self.loadRegression, font=self.ComicF2)
@@ -92,8 +100,8 @@ class AChild(tk.Toplevel):
     def _layoutCanvas(self, parent, driver_info):
 
         try:
-            pil_image = Driver_Profile.get_driver_image(driver_info)
-            self.image = ImageTk.PhotoImage(pil_image)
+            self.pil_image = Driver_Profile.get_driver_image(driver_info)
+            self.image = ImageTk.PhotoImage(self.pil_image)
 
             self.canvas = tk.Canvas(parent, height=self.height, width=self.width)
             self.canvas.grid(row=3, column=0, sticky=N + S + E + W)
@@ -280,6 +288,121 @@ class AChild(tk.Toplevel):
 
         canvas.draw()
 
+    def loadComparison(self):
+        self.Comparison_ChildObj.show()
+        self.Comparison_ChildObj.set_selected_driver(self.driver_name, self.connections)
+        self.wait_variable(self.Comparison_ChildObj.s_var)
+        compare_pil_image = self.Comparison_ChildObj.loadDriversData()
+
+        # Get the driver and constructors total points
+        consPoints_driverPoints_relationship = Driver_Data_2.get_driver_constructor_points(self.connections,
+                                                                                          self.driver_name)
+        fig = plt.Figure(figsize=(8,8))
+
+        grid = plt.GridSpec(4,2, figure=fig, wspace=0.3, hspace=0.5)
+        # Assign Original Driver to the first image.
+        ax_image1 = fig.add_subplot(grid[0,0])
+        image1_data = np.array(self.pil_image)
+        ax_image1.imshow(image1_data)
+        ax_image1.axis('off')
+
+        ax_image1 = fig.add_subplot(grid[0, 1])
+        image2_data = np.array(compare_pil_image)
+        ax_image1.imshow(image2_data)
+        ax_image1.axis('off')
+
+        ax1 = fig.add_subplot(grid[1,0])
+        ax1.scatter(consPoints_driverPoints_relationship['constructor_points'],
+                    consPoints_driverPoints_relationship['driver_points'], color='deepskyblue', marker='o')
+        line = mlines.Line2D([0, 1], [0, 1], color='red')
+        transform = ax1.transAxes
+        line.set_transform(transform)
+        ax1.add_line(line)
+
+        ax1.set_xlabel('Constructor Points')
+        ax1.set_ylabel('Driver Points')
+        ax1.set_title('Relationship Constructor & Driver points (Top 15 wins)')
+        ax1.grid(True, linestyle='--', alpha=0.7)
+
+        # Get the drivers & constructor total wins and loses
+        df_top_fifteen_wins_constructor = Driver_Data_2.get_driver_constructor_wins(self.connections, self.driver_name)
+
+        bar_width = 0.4
+        bar_positions = range(len(df_top_fifteen_wins_constructor))
+
+        ax2 = fig.add_subplot(grid[1,1])
+        ax2.bar(bar_positions, df_top_fifteen_wins_constructor['constructor_wins'], color='yellowgreen',
+                label='Constructor Wins', width=bar_width)
+        ax2.bar([pos + bar_width for pos in bar_positions], df_top_fifteen_wins_constructor['driver_wins'],
+                color='lightcoral', width=bar_width, label='Driver Wins')
+
+        ax2.set_xticks([pos + bar_width / 2 for pos in bar_positions])
+        ax2.set_xticklabels(f'Race {i + 1}' for i in bar_positions)
+        ax2.set_xlabel('Races')
+        ax2.set_ylabel('Number of wins')
+        ax2.set_title('Constructor Wins and driver win contribution')
+        ax2.grid(True, linestyle='--', alpha=0.7)
+        ax2.legend()
+
+        # Get drivers status
+        df_driver_status = Driver_Data_2.get_driver_status_races(self.connections, self.driver_name)
+
+        ax3 = fig.add_subplot(grid[2,0])
+        ax3.barh(df_driver_status['status'], df_driver_status['count'], color='salmon')
+        ax3.set_xlabel('Count of statuses')
+        ax3.set_ylabel('Status Type')
+        ax3.set_title('Different Statuses for races')
+
+        fastestSpeeds = Driver_Data_2.get_driver_fastestlap_count(self.connections, self.driver_name)
+        theBins = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80]
+        ax4 = fig.add_subplot(grid[2,1])
+        counts, bins, bars = ax4.hist(fastestSpeeds['fastestLap'], bins=theBins, edgecolor='black', color='gainsboro')
+        ax4.plot(bins[:-1] + 1.5 / 2, counts, color='red')
+        mean = fastestSpeeds['fastestLap'].mean()
+        mode = fastestSpeeds['fastestLap'].mode().values[0]
+
+        ax4.axvline(mean, color='green', linestyle='--', label="Mean")
+        ax4.axvline(mode, color='blue', linestyle='--', label="Mode")
+
+        ax4.set_xlabel('0 - 80 Lap (bins)')
+        ax4.set_ylabel('Count of Fastest Lap')
+        ax4.set_title('Frequency Distribution for Lap No.')
+        ax4.legend()
+
+        ax5 = fig.add_subplot(grid[3, 0])
+        ax5.bar(bar_positions, df_top_fifteen_wins_constructor['constructor_wins'], color='yellowgreen',
+                label='Constructor Wins', width=bar_width)
+        ax5.bar([pos + bar_width for pos in bar_positions], df_top_fifteen_wins_constructor['driver_wins'],
+                color='lightcoral', width=bar_width, label='Driver Wins')
+
+        ax5.set_xticks([pos + bar_width / 2 for pos in bar_positions])
+        ax5.set_xticklabels(f'Race {i + 1}' for i in bar_positions)
+        ax5.set_xlabel('Races')
+        ax5.set_ylabel('Number of wins')
+        ax5.set_title('Constructor Wins and driver win contribution')
+        ax5.grid(True, linestyle='--', alpha=0.7)
+        ax5.legend()
+
+        ax6 = fig.add_subplot(grid[3, 1])
+        ax6.bar(bar_positions, df_top_fifteen_wins_constructor['constructor_wins'], color='yellowgreen',
+                label='Constructor Wins', width=bar_width)
+        ax6.bar([pos + bar_width for pos in bar_positions], df_top_fifteen_wins_constructor['driver_wins'],
+                color='lightcoral', width=bar_width, label='Driver Wins')
+
+        ax6.set_xticks([pos + bar_width / 2 for pos in bar_positions])
+        ax6.set_xticklabels(f'Race {i + 1}' for i in bar_positions)
+        ax6.set_xlabel('Races')
+        ax6.set_ylabel('Number of wins')
+        ax6.set_title('Constructor Wins and driver win contribution')
+        ax6.grid(True, linestyle='--', alpha=0.7)
+        ax6.legend()
+
+        canvas = FigureCanvasTkAgg(fig, master=self.canvasPanel)
+        canvas_widget = canvas.get_tk_widget()
+
+        canvas_widget.grid(row=3, column=0, sticky=N + S + E + W)
+
+        canvas.draw()
 
     def show(self):
         self.update()  # Update the window
