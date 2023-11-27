@@ -266,7 +266,7 @@ class AChild(tk.Toplevel):
         axes[0,0].set_title("Linear Regression on Lap Time based on Lap Speed in " + circuit)
         axes[0,0].set_ylabel("LapTime(Seconds)")
         axes[0,0].set_xlabel("LapSpeed(km/hr)")
-        plt.text(0.5, 1.03, "The coefficient of determination is (R²): " + str(regression_score), color='blue', fontsize=12, ha='center', va='center',
+        plt.text(0.6, 0.988, "The coefficient of determination is (R²): " + str(regression_score), color='blue', fontsize=12, ha='center', va='center',
                  transform=lm.ax.transAxes)
         plt.text(0.230, 0.988, "Based on the lap speed: " + str(lap_speed) + "(km/hr), the predicted lap time the driver should achieve is: " + str(individual_prediction) + " (seconds)", color='green',
                  fontsize=12, ha='center', va='center',
