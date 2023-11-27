@@ -260,12 +260,18 @@ class AChild(tk.Toplevel):
         sns.set(style='whitegrid')
         lm = sns.lmplot(data=melted_data, x='Lap_Speed(km/hr)', y='LapTime(Seconds)',hue ='TypeOfData',
            markers =['o', 'v'], scatter_kws ={'s':100},
-           palette ='plasma')
+           palette ='plasma', legend=False, aspect=2)
 
         axes = lm.axes
         axes[0,0].set_title("Linear Regression on Lap Time based on Lap Speed in " + circuit)
-        axes[0,0].set_xlabel("LapTime(Seconds)")
-        axes[0,0].set_ylabel("Lap_Speed(km/hr)")
+        axes[0,0].set_ylabel("LapTime(Seconds)")
+        axes[0,0].set_xlabel("LapSpeed(km/hr)")
+        plt.text(0.5, 1.03, "The coefficient of determination is (R²): " + str(regression_score), color='blue', fontsize=12, ha='center', va='center',
+                 transform=lm.ax.transAxes)
+        plt.text(0.230, 0.988, "Based on the lap speed: " + str(lap_speed) + "(km/hr), the predicted lap time the driver should achieve is: " + str(individual_prediction) + " (seconds)", color='green',
+                 fontsize=12, ha='center', va='center',
+                 transform=lm.ax.transAxes)
+        plt.legend(title='TypeOfData', loc='upper right', bbox_to_anchor=(0.95,0.98))
 
         canvas = FigureCanvasTkAgg(lm.fig, master=self.canvasPanel)
         canvas_widget = canvas.get_tk_widget()
