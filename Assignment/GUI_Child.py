@@ -1,6 +1,7 @@
 from tkinter import *
 import tkinter as tk
 
+import pandas as pd
 import self
 from PIL import ImageTk
 from tkinter import font, ttk
@@ -13,6 +14,7 @@ from Driver_Regression import Driver_Regression
 import matplotlib.pyplot as plt
 import matplotlib.pyplot as mlines
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import seaborn as sns
 
 
 class AChild(tk.Toplevel):
@@ -238,29 +240,34 @@ class AChild(tk.Toplevel):
 
     def loadRegression(self):
         self.Regression_ChildObj.show()
-        # s = self.Regression_ChildObj.set_selected_driver(self.driver_name, self.connections)
+        self.Regression_ChildObj.set_selected_driver(self.driver_name, self.connections)
 
         self.wait_variable(self.Regression_ChildObj.s_var)
-        print("hi")
+        individual_prediction,y_pred ,regression_score, x_train, x_test, y_train, y_test, circuit, lap_speed = self.Regression_ChildObj.regression_analysis()
+        print(individual_prediction)
+        print(circuit)
+        print(lap_speed)
 
-        fig, (ax1) = plt.subplots(1, 1, dpi=70)
-        # Get the driver and constructors total points
-        consPoints_driverPoints_relationship = Driver_Data_2.get_driver_constructor_points(self.connections,
-                                                                                           self.driver_name)
+        predicted = round(pd.DataFrame(y_pred, columns=['predictedLapTime']),2)
 
-        ax1.scatter(consPoints_driverPoints_relationship['constructor_points'],
-                    consPoints_driverPoints_relationship['driver_points'], color='deepskyblue', marker='o')
-        line = mlines.Line2D([0, 1], [0, 1], color='red')
-        transform = ax1.transAxes
-        line.set_transform(transform)
-        ax1.add_line(line)
+        combined_data = predicted.join([x_test.reset_index(drop=True), y_test.reset_index(drop=True)])
 
-        ax1.set_xlabel('Constructor Points')
-        ax1.set_ylabel('Driver Points')
-        ax1.set_title('Relationship Constructor & Driver points (Top 15 wins)')
-        ax1.grid(True, linestyle='--', alpha=0.7)
+        melted_data = pd.melt(combined_data, id_vars=['Lap_Speed(km/hr)'],
+                         value_vars=['predictedLapTime', 'fastestLapTime'],
+                         var_name='TypeOfData', value_name='LapTime(Seconds)')
 
-        canvas = FigureCanvasTkAgg(fig, master=self.canvasPanel)
+        # fig, (ax1) = plt.subplots(1, 1, dpi=100)
+        sns.set(style='whitegrid')
+        lm = sns.lmplot(data=melted_data, x='Lap_Speed(km/hr)', y='LapTime(Seconds)',hue ='TypeOfData',
+           markers =['o', 'v'], scatter_kws ={'s':100},
+           palette ='plasma')
+
+        axes = lm.axes
+        axes[0,0].set_title("Linear Regression on Lap Time based on Lap Speed in " + circuit)
+        axes[0,0].set_xlabel("LapTime(Seconds)")
+        axes[0,0].set_ylabel("Lap_Speed(km/hr)")
+
+        canvas = FigureCanvasTkAgg(lm.fig, master=self.canvasPanel)
         canvas_widget = canvas.get_tk_widget()
 
         canvas_widget.grid(row=3, column=0, sticky=N + S + E + W)
