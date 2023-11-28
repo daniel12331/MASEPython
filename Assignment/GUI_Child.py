@@ -1,20 +1,15 @@
 from tkinter import *
 import tkinter as tk
-
 import numpy as np
 import pandas as pd
 from PIL import ImageTk
-from tkinter import font, ttk
+from tkinter import font
 import webbrowser
-
-from matplotlib import image as mpimg
-
 import Driver_Profile
 import Driver_Data_1
 import Driver_Data_2
 from Driver_Regression import Driver_Regression
 from Driver_Comparison import Driver_Comparison
-
 import matplotlib.pyplot as plt
 import matplotlib.pyplot as mlines
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -40,6 +35,8 @@ class AChild(tk.Toplevel):
         self.width = 1900
         self.height = 1080
         self.geometry('1915x1080')
+        self.image_width = 1810
+        self.image_he = 1040
 
         # MAC 13.3 RES
         # self.width = 1400
@@ -100,13 +97,22 @@ class AChild(tk.Toplevel):
 
         try:
             self.pil_image = Driver_Profile.get_driver_image(driver_info)
-            self.image = ImageTk.PhotoImage(self.pil_image)
+            resized = self.pil_image.resize((self.image_width,self.image_he))
+            self.image = ImageTk.PhotoImage(resized)
 
             self.canvas = tk.Canvas(parent, height=self.height, width=self.width)
             self.canvas.grid(row=3, column=0, sticky=N + S + E + W)
+
+            canvas_width = self.canvas.winfo_reqwidth()
+            canvas_height = self.canvas.winfo_reqheight()
+
+            x = (canvas_width - self.pil_image.width) // 2
+            y = (canvas_height - self.pil_image.height) // 2
+
             self.canvas.create_image(0, 1, anchor='nw', image=self.image)
 
         except Exception as e:
+            print(e)
             self.loadDefaultImg(parent)
 
     def loadDefaultImg(self, parent):
@@ -115,6 +121,7 @@ class AChild(tk.Toplevel):
 
         self.canvas = tk.Canvas(parent, height=1080, width=1920)
         self.canvas.grid(row=3, column=0, sticky=N + S + E + W)
+
         self.canvas.create_image(0, 1, anchor='nw', image=self.image)
 
     def loadRacesData1(self):
@@ -252,9 +259,6 @@ class AChild(tk.Toplevel):
 
         self.wait_variable(self.Regression_ChildObj.s_var)
         individual_prediction,y_pred ,regression_score, x_train, x_test, y_train, y_test, circuit, lap_speed = self.Regression_ChildObj.regression_analysis()
-        print(individual_prediction)
-        print(circuit)
-        print(lap_speed)
 
         predicted = round(pd.DataFrame(y_pred, columns=['predictedLapTime']),2)
 
@@ -334,14 +338,14 @@ class AChild(tk.Toplevel):
         # Get the drivers five fastest laps
         fastestsTimes = Driver_Data_1.get_driver_fastests_laps(self.connections, self.driver_name)
 
-        ax3 = fig.add_subplot(grid[2,0])
+        ax3 = fig.add_subplot(grid[3,0])
         ax3.bar(fastestsTimes['racetracks'], fastestsTimes['fastestLapTime'])
         ax3.set_ylabel('Fastests Lap times (seconds)')
         ax3.set_title('Top Five Fastest Lap Times')
         ax3.set_ylim(min(fastestsTimes['fastestLapTime']) - 0.5, max(fastestsTimes['fastestLapTime'] + 0.5))
         ax3.tick_params(axis='x', labelrotation=15)
 
-        for patch in ax1.patches:
+        for patch in ax3.patches:
             x0, y0 = patch.get_xy()
             x0 += patch.get_width() / 2
             y0 += patch.get_height()
@@ -350,55 +354,57 @@ class AChild(tk.Toplevel):
                      bbox=dict(ec="black", fc=color))
 
 
-        fastestSpeeds = Driver_Data_2.get_driver_fastestlap_count(self.connections, self.driver_name)
-        theBins = [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80]
-        ax4 = fig.add_subplot(grid[2,1])
-        counts, bins, bars = ax4.hist(fastestSpeeds['fastestLap'], bins=theBins, edgecolor='black', color='gainsboro')
-        ax4.plot(bins[:-1] + 1.5 / 2, counts, color='red')
-        mean = fastestSpeeds['fastestLap'].mean()
-        mode = fastestSpeeds['fastestLap'].mode().values[0]
 
-        ax4.axvline(mean, color='green', linestyle='--', label="Mean")
-        ax4.axvline(mode, color='blue', linestyle='--', label="Mode")
+        # Get the drivers five fastest laps
+        fastestsTimes = Driver_Data_1.get_driver_fastests_laps(self.connections, compare_driver_name)
 
-        ax4.set_xlabel('0 - 80 Lap (bins)')
-        ax4.set_ylabel('Count of Fastest Lap')
-        ax4.set_title('Frequency Distribution for Lap No.')
-        ax4.legend()
+        ax4 = fig.add_subplot(grid[3,1])
+        ax4.bar(fastestsTimes['racetracks'], fastestsTimes['fastestLapTime'])
+        ax4.set_ylabel('Fastests Lap times (seconds)')
+        ax4.set_title('Top Five Fastest Lap Times')
+        ax4.set_ylim(min(fastestsTimes['fastestLapTime']) - 0.5, max(fastestsTimes['fastestLapTime'] + 0.5))
+        ax4.tick_params(axis='x', labelrotation=15)
 
-        # ax5 = fig.add_subplot(grid[3, 0])
-        # ax5.bar(bar_positions, df_top_fifteen_wins_constructor['constructor_wins'], color='yellowgreen',
-        #         label='Constructor Wins', width=bar_width)
-        # ax5.bar([pos + bar_width for pos in bar_positions], df_top_fifteen_wins_constructor['driver_wins'],
-        #         color='lightcoral', width=bar_width, label='Driver Wins')
-        #
-        # ax5.set_xticks([pos + bar_width / 2 for pos in bar_positions])
-        # ax5.set_xticklabels(f'Race {i + 1}' for i in bar_positions)
-        # ax5.set_xlabel('Races')
-        # ax5.set_ylabel('Number of wins')
-        # ax5.set_title('Constructor Wins and driver win contribution')
-        # ax5.grid(True, linestyle='--', alpha=0.7)
-        # ax5.legend()
-        #
-        # ax6 = fig.add_subplot(grid[3, 1])
-        # ax6.bar(bar_positions, df_top_fifteen_wins_constructor['constructor_wins'], color='yellowgreen',
-        #         label='Constructor Wins', width=bar_width)
-        # ax6.bar([pos + bar_width for pos in bar_positions], df_top_fifteen_wins_constructor['driver_wins'],
-        #         color='lightcoral', width=bar_width, label='Driver Wins')
-        #
-        # ax6.set_xticks([pos + bar_width / 2 for pos in bar_positions])
-        # ax6.set_xticklabels(f'Race {i + 1}' for i in bar_positions)
-        # ax6.set_xlabel('Races')
-        # ax6.set_ylabel('Number of wins')
-        # ax6.set_title('Constructor Wins and driver win contribution')
-        # ax6.grid(True, linestyle='--', alpha=0.7)
-        # ax6.legend()
+        for patch in ax4.patches:
+            x0, y0 = patch.get_xy()
+            x0 += patch.get_width() / 2
+            y0 += patch.get_height()
+            color = patch.get_facecolor()
+            ax4.text(x0, y0, str(y0), ha="center", va="bottom", color="white", clip_on=True,
+                     bbox=dict(ec="black", fc=color))
+
+        fastestSpeeds = Driver_Data_1.get_driver_top_speed(self.connections, self.driver_name)
+        ax5 = fig.add_subplot(grid[2,0])
+        s = ax5.barh(fastestSpeeds['name'], fastestSpeeds['fastestLapSpeed'], color='darkorchid')
+        ax5.set_xlabel('Highest Speeds (km/h)')
+
+        ax5.set_title('Top Five Fastest Speeds')
+        high_limit = max(fastestSpeeds['fastestLapSpeed']) + 5
+        low_limit = min(fastestSpeeds['fastestLapSpeed']) - 5
+        ax5.set_xlim(low_limit, high_limit)
+
+        ax5.tick_params(axis='y', labelrotation=50)
+        ax5.bar_label(s, label_type="center", color='white')
+
+
+        fastestSpeeds = Driver_Data_1.get_driver_top_speed(self.connections, compare_driver_name)
+        ax6 = fig.add_subplot(grid[2, 1])
+        s = ax6.barh(fastestSpeeds['name'], fastestSpeeds['fastestLapSpeed'], color='darkorchid')
+        ax6.set_xlabel('Highest Speeds (km/h)')
+
+        ax6.set_title('Top Five Fastest Speeds')
+        high_limit = max(fastestSpeeds['fastestLapSpeed']) + 5
+        low_limit = min(fastestSpeeds['fastestLapSpeed']) - 5
+        ax6.set_xlim(low_limit, high_limit)
+
+        ax6.tick_params(axis='y', labelrotation=50)
+        ax6.bar_label(s, label_type="center", color='white')
 
         canvas = FigureCanvasTkAgg(fig, master=self.canvasPanel)
         canvas_widget = canvas.get_tk_widget()
-        fig.text(0.245, 0.9, self.driver_name, fontsize=12, color="red", ha='left')
+        fig.text(0.253, 0.9, self.driver_name, fontsize=12, color="red", ha='left')
         fig.text(0.5, 0.9, "Vs.", fontsize=12, color="black", ha='center')
-        fig.text(0.775, 0.9, compare_driver_name, fontsize=12, color="blue", ha='right')
+        fig.text(0.770, 0.9, compare_driver_name, fontsize=12, color="blue", ha='right')
 
         canvas_widget.grid(row=3, column=0, sticky=N + S + E + W)
 

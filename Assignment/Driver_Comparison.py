@@ -1,18 +1,11 @@
 import tkinter.messagebox
-
 from tkinter import *
 import tkinter as tk
-from tkinter import font, ttk
-
-import numpy as np
+from tkinter import font
 import pandas as pd
 from PIL import ImageTk
-from matplotlib import pyplot as plt
-from sklearn.linear_model import LinearRegression
-from sklearn.model_selection import train_test_split
-
 import Driver_Profile
-from Assignment import Driver_Data_1
+import Driver_Data_1
 
 
 class Driver_Comparison(tk.Toplevel):

@@ -1,9 +1,11 @@
-import pandas as pd
 from tkinter import *
+
+from SplashScreen import preformSplashScreen
 from GUI_main import AppGUI
 
 
 def main():
+
     root = Tk()
 
     myGUI = AppGUI(root)
@@ -15,4 +17,5 @@ def main():
 
 
 if __name__ == '__main__':
+    preformSplashScreen()
     main()

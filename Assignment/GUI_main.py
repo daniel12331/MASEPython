@@ -3,11 +3,10 @@ from tkinter import font
 import tkinter.messagebox
 import tkinter.simpledialog
 from tkinter import *
-
 import mysql.connector
 import pandas as pd
-
 from PIL import ImageTk, Image
+from tabulate import tabulate
 from GUI_Child import AChild
 
 
@@ -63,6 +62,11 @@ class AppGUI(tk.Frame):
 
         self.close_button = tk.Button(master, text="Close", command=self.CloseApplication, font=self.font_2, ).grid(row=7,column=1,columnspan=2,ipadx=5, ipady=5, padx=10, pady=5,sticky=tk.N + tk.S + tk.E + tk.W)
 
+        table_name = ['status', 'results', 'races', 'circuits', 'constructor_standings', 'driver_standings', 'drivers']
+
+        for table_nme in table_name:
+            self.preformEDA(table_nme)
+
     def analyse_btn(self):
         selected_index = self.list_box.curselection()
         if selected_index != ():
@@ -94,9 +98,23 @@ class AppGUI(tk.Frame):
             else:
                 tkinter.messagebox.showwarning("No Results", "No matching results found.")
 
+    def preformEDA(self, tablenme):
+        print("The performEDA function")
+        query = "SELECT * FROM " + tablenme
+        frame = pd.read_sql(query, self.connection)
+        print("\n\n\n ******************** {0} ********************".format(tablenme))
+
+        print('\n\nPrint Dataframe Info for table {0}'.format(tablenme))
+        print(frame.info())
+        print('\n\nPrint Number of Unique Items in Each Column for table {0}'.format(tablenme))
+        print(frame.apply(pd.unique))
+        print("\n\nTable: {0}".format(tablenme))
+        print(tabulate(frame.head(), headers='keys', tablefmt='pretty', showindex=True))
+        print(tabulate(frame.tail(), headers='keys', tablefmt='pretty', showindex=True))
 
     def CloseApplication(self):
         self.master.destroy()
+
 
     def show(self):
         self.master.update()

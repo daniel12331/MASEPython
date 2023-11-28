@@ -1,9 +1,6 @@
 import io
 from tkinter import *
-import tkinter as tk
-from PIL import ImageTk, Image
-from tkinter import font
-import webbrowser
+from PIL import Image
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
@@ -12,8 +9,6 @@ from bs4 import BeautifulSoup
 def get_driver_url(driver_name, connection):
     query_drivers_names = "SELECT * FROM drivers WHERE CONCAT(forename, ' ', surname) = '{0}'".format(driver_name)
     df_mysql = pd.read_sql(query_drivers_names, con=connection)
-    print(driver_name)
-    print(df_mysql)
     driver_info = df_mysql['url'][0]
     return driver_info
 
