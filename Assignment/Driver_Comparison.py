@@ -109,7 +109,7 @@ class Driver_Comparison(tk.Toplevel):
             img_Path = 'images/no_image.png'
             self.pil_image = ImageTk.PhotoImage(file=img_Path)
 
-        return self.pil_image
+        return self.pil_image, self.selected_driver_name
 
     def show(self):
         self.update()  # Update the window
